@@ -12,8 +12,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-//get related videos
-
 //post comment 
 router.post ('/', async (req, res) => {
     try {
@@ -36,6 +34,41 @@ router.post ('/', async (req, res) => {
 });
 
 //put for likes / dislikes
+router.put('/:id/likes', async (req, res) => {
+    try {
+        const { error } = validateComment(req.body);
+        if (error) return res.status(400).send(error);
+
+        const comment = await Comment.findById(req.params.id);
+        if(!comment)
+        return res.status(400).send(`The comment id "${req.params.id}" does not exist.`);
+
+        comment.likes=req.body.likes;
+
+        await comment.save();
+        return res.send(comment);
+    }   catch (ex){
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+    }
+});
+
+router.put('/:id/dislikes', async (req, res) => {
+    try { 
+        const { error } = validateComment(req.body);
+        if (error) return res.status(400).send(error);
+
+        const comment = await Comment.findById(req.params.id);
+        if(!comment)
+        return res.status(400).send(`The comment id "${req.params.id}" does not exist.`);
+
+        comment.dislikes=req.body.dislikes;
+
+        await comment.save();
+        return res.send(comment);
+    }   catch (ex) {
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+    }
+});
 
 //post reply 
 
