@@ -1,4 +1,4 @@
-const { Comment } = require ('../models/comment');
+const { Comment, validateComment } = require ('../models/comment');
 const express = require('express');
 const router = express.Router();
 
@@ -15,7 +15,28 @@ router.get('/', async (req, res) => {
 //get related videos
 
 //post comment 
+router.post ('/', async (req, res) => {
+    try {
+        const { error } = validateComment(req.body);
+        if (error)
+            return res.status(400).send(error);
+
+        const comment = new Comment({
+            text: req.body.text,
+            videoId: req.body.videoId,
+        });
+
+        await comment.save();
+
+        return res.send(comment);
+
+    }   catch (ex){
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+    }
+});
 
 //put for likes / dislikes
 
 //post reply 
+
+module.exports = router;
