@@ -1,4 +1,4 @@
-const { Comment, validateComment } = require ('../models/comment');
+const { Comment, Reply, validateComment, validateReply } = require ('../models/comment');
 const express = require('express');
 const router = express.Router();
 
@@ -71,5 +71,26 @@ router.put('/:id/dislikes', async (req, res) => {
 });
 
 //post reply 
+router.post('/:commentId/replies', async (req, res) => {
+    try {
+        const { error } = validateReply(req.body);
+        if (error) return res.status(400).send(error);
+
+        const comment = await Comment.findById(req.params.commentId);
+        if(!comment)
+        return res.status(400).send(`The comment id "${req.params.commentId}" does not exist.`);
+        
+        const reply = new Reply({
+            text: req.body.text,
+        });
+
+        comment.replies.push(reply);
+        await comment.save();
+
+        return res.send(comment.replies);
+    }   catch (ex){
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+    }
+});
 
 module.exports = router;
