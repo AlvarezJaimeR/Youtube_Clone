@@ -36,14 +36,11 @@ router.post ('/', async (req, res) => {
 //put for likes / dislikes
 router.put('/:id/likes', async (req, res) => {
     try {
-        const { error } = validateComment(req.body);
-        if (error) return res.status(400).send(error);
-
         const comment = await Comment.findById(req.params.id);
         if(!comment)
         return res.status(400).send(`The comment id "${req.params.id}" does not exist.`);
 
-        comment.likes=req.body.likes;
+        comment.likes ++;
 
         await comment.save();
         return res.send(comment);
@@ -54,14 +51,11 @@ router.put('/:id/likes', async (req, res) => {
 
 router.put('/:id/dislikes', async (req, res) => {
     try { 
-        const { error } = validateComment(req.body);
-        if (error) return res.status(400).send(error);
-
         const comment = await Comment.findById(req.params.id);
         if(!comment)
         return res.status(400).send(`The comment id "${req.params.id}" does not exist.`);
 
-        comment.dislikes=req.body.dislikes;
+        comment.dislikes ++;
 
         await comment.save();
         return res.send(comment);
